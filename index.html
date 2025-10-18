@@ -243,7 +243,11 @@
       max-width: 100%;
       justify-content: center;
       align-items: end;
-      direction: rtl; /* جهت RTL برای چینش از راست به چپ */
+      direction: rtl; /* جهت RTL */
+    }
+    .product:first-child { /* "یادگاری" (index 0) */
+      grid-column: 2; /* ستون دوم (سمت راست) */
+      grid-row: 1;    /* ردیف اول */
     }
     .cart {
       position: fixed;
@@ -608,7 +612,7 @@
     const addressError = document.getElementById('addressError');
     function renderProducts() {
       flashList.innerHTML = '';
-      productsData.forEach(p => {
+      productsData.forEach((p, index) => {
         const isFeatured = p.id === 'p1';
         const isSelected = cart[p.id] && cart[p.id].qty > 0;
         const el = document.createElement('div');
@@ -626,6 +630,10 @@
             </div>
           </div>
         `;
+        if (index === 0) { // "یادگاری" (index 0)
+          el.style.gridColumn = '2'; // ستون دوم (سمت راست)
+          el.style.gridRow = '1';    // ردیف اول
+        }
         flashList.appendChild(el);
       });
     }
@@ -836,7 +844,7 @@
       if (totalQty >= 13 && totalQty <= 20) discountPercent = 23;
       if (totalQty >= 21) discountPercent = 26;
       let discount = Math.round(total * discountPercent / 100);
-      const finalAmountRial = (total - discount) * 10; // تبدیل به ریال (1 تومان = 10 ریال)
+      const finalAmountRial = (total - discount) * 10; // تبدیل به ریال
       fetch(checkoutForm.action, {
         method: 'POST',
         body: new FormData(checkoutForm),
