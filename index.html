@@ -812,24 +812,35 @@
       return isValid;
     }
     function handleNext(event) {
-      event.preventDefault();
-      if (!validateForm()) return;
-      const name = document.getElementById('name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const city = document.getElementById('city').value.trim();
-      const address = document.getElementById('address').value.trim();
-      const items = Object.values(cart).filter(i => i.qty > 0);
-      const formData = {
-        name,
-        phone,
-        city,
-        address,
-        postalCode: document.getElementById('postalCode').value.trim(),
-        notes: document.getElementById('notes').value.trim(),
-        cart: items
-      };
-      console.log('Submitting form data:', formData);
-      document.getElementById('cartData').value = JSON.stringify(formData.cart);
+  event.preventDefault();
+  if (!validateForm()) return;
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const city = document.getElementById('city').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const postalCode = document.getElementById('postalCode').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+  const items = Object.values(cart).filter(i => i.qty > 0);
+  const formData = new URLSearchParams({
+    Name: name,
+    Phone: phone,
+    City: city,
+    Address: address,
+    PostalCode: postalCode,
+    Notes: notes,
+    Cart: JSON.stringify(items)
+  }).toString();
+  console.log('Submitting to Tally:', formData);
+  fetch('https://tally.so/r/https://tally.so/r/3xeg5J/submit', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: formData
+  }).then(response => {
+    console.log('Tally response:', response);
+    if (response.ok) {
+      showToast('اطلاعات با موفقیت ثبت شد');
       let total = 0;
       items.forEach(it => total += it.price * it.qty);
       let discountPercent = 0;
@@ -844,29 +855,18 @@
       if (totalQty >= 13 && totalQty <= 20) discountPercent = 23;
       if (totalQty >= 21) discountPercent = 26;
       let discount = Math.round(total * discountPercent / 100);
-      const finalAmountRial = (total - discount) * 10; // تبدیل به ریال
-      fetch(checkoutForm.action, {
-        method: 'POST',
-        body: new FormData(checkoutForm),
-        headers: {
-          'Accept': 'application/json'
-        }
-      }).then(response => {
-        console.log('Formspree response:', response);
-        if (response.ok) {
-          showToast('اطلاعات با موفقیت ثبت شد');
-          // هدایت به درگاه زیبال
-          setTimeout(() => {
-            window.location.href = `https://gateway.zibal.ir/start/YOUR_ZIBAL_MERCHANT_ID?amount=${finalAmountRial}&mobile=${phone}&description=سفارش فلش از فروشگاه علی زدکا`;
-          }, 1000);
-        } else {
-          showToast('خطا در ثبت اطلاعات فرم');
-        }
-      }).catch(error => {
-        console.error('Form submission error:', error);
-        showToast('خطا در ثبت اطلاعات فرم');
-      });
+      const finalAmountRial = (total - discount) * 10;
+      setTimeout(() => {
+        window.location.href = `https://gateway.zibal.ir/start/YOUR_ZIBAL_MERCHANT_ID?amount=${finalAmountRial}&mobile=${phone}&description=سفارش فلش از فروشگاه علی زدکا`;
+      }, 1000);
+    } else {
+      showToast('خطا در ثبت اطلاعات فرم');
     }
+  }).catch(error => {
+    console.error('Form submission error:', error);
+    showToast('خطا در ثبت اطلاعات فرم');
+  });
+}
     function goToCheckout() {
       const items = Object.values(cart).filter(i => i.qty > 0);
       const totalQty = items.reduce((s, i) => s + i.qty, 0);
