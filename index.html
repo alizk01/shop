@@ -107,38 +107,28 @@
     </form>
   </div>
 
- <script>
-  // --- جایگزین تابع submitForm قبلی کن ---
-  async function submitForm(e) {
-    // e = event از onsubmit="return submitForm(event)"
-    // اگر اعتبارسنجی رد شد، جلوی ارسال را بگیر
-    if (typeof validateForm === 'function' && !validateForm()) {
-      e.preventDefault();
-      alert('فیلدهای فرم کامل یا صحیح نیستند یا سبد خرید خالی است.');
-      return false;
-    }
-
-    // مقداردهی cartData (محدود می‌کنیم تا خیلی بزرگ نشود)
+<script>
+  function submitForm(e) {
+    // اگر اعتبارسنجی داشتی، اینجا بررسی کن و در صورت رد شدن return false
     try {
-      const items = Array.isArray(window.cartItems) ? window.cartItems : [];
-      const safe = JSON.stringify(items).slice(0, 3000); // حداکثر 3000 کاراکتر
-      // اگر فیلد مخفی cartData وجود ندارد، بسازش
-      let cartInput = document.querySelector('#form input[name="cartData"]');
+      const items = window.cartItems || [];
+      const safe = JSON.stringify(items).slice(0,3000);
+      let cartInput = document.querySelector('form input[name="cartData"]');
       if (!cartInput) {
         cartInput = document.createElement('input');
         cartInput.type = 'hidden';
         cartInput.name = 'cartData';
-        document.getElementById('form').appendChild(cartInput);
+        document.querySelector('form').appendChild(cartInput);
       }
       cartInput.value = safe;
-    } catch (err) {
-      console.error('خطا هنگام آماده‌سازی cartData', err);
-      // اگر با این خطا هم روبرو شدیم، جلو ارسال را نگیریم — فقط مقدار نمی‌شود ارسال شد
-    }
-
-    // اجازه بده مرورگر فرم را ارسال کند (بدون fetch و بدون تلاش برای خواندن JSON)
-    return true;
+    } catch (err) { console.error(err); }
+    return true; // مهم: اجازه بده مرورگر فرم را ارسال کند
   }
 </script>
+
+<form action="https://api.web3forms.com/submit" method="POST" onsubmit="return submitForm(event)">
+  <!-- inputs... -->
+</form>
+
 </body>
 </html>
