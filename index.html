@@ -8,7 +8,7 @@
   <title>فروشگاه علی زدکا</title>
   <link href="https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.css" rel="stylesheet">
   <style>
-    /* --- تمام CSS قبلی بدون تغییر --- */
+    /* تمام CSS بدون تغییر باقی می‌ماند */
     :root { --bg: #0b0c0e; --card: #0f1113; --muted: #9aa0a6; --text: #e6e7e8; --accent: #3aa6ff; --accent-2: #7bd389; --error: #ff5252; }
     html, body { height: 100%; margin: 0; padding: 0; overflow-x: hidden; background: var(--bg); }
     body { display: flex; align-items: flex-start; justify-content: center; padding: 24px; padding-bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 100vh; background: var(--bg); }
@@ -56,6 +56,8 @@
     .cart-icon::before { content: '🛒'; font-size: 24px; }
     input, textarea, select { width: 100%; padding: 12px 14px; border-radius: 12px; background: #121314; border: 1px solid rgba(255,255,255,0.05); color: var(--text); font-size: 14px; margin-bottom: 10px; box-sizing: border-box; }
     button { cursor: pointer; }
+    .error-message { color: var(--error); font-size: 14px; margin-top: 10px; }
+    .success-message { color: var(--accent-2); font-size: 14px; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -68,7 +70,6 @@
       <div class="btn primary" onclick="showProducts()">ورود به محصولات</div>
     </div>
   </div>
-
   <div class="card hidden" id="products">
     <div class="back-button" onclick="goHome()">←</div>
     <h2 class="product-title">انتخاب محصول</h2>
@@ -85,13 +86,11 @@
       </div>
     </div>
   </div>
-
   <div class="cart" id="cart">
     <h4>سبد خرید</h4>
     <div class="cart-list" id="cartList"></div>
     <a href="#" class="checkout-btn" onclick="goToCheckout()">مرحله بعدی</a>
   </div>
-
   <div class="card hidden" id="checkout">
     <h2>فرم خرید</h2>
     <form id="form" action="https://api.web3forms.com/submit" method="POST" onsubmit="return submitForm(event)">
@@ -99,36 +98,95 @@
       <input type="hidden" name="subject" value="فرم خرید فروشگاه علی زدکا">
       <input type="hidden" name="from_name" value="فروشگاه علی زدکا">
       <input type="hidden" name="redirect" value="https://zibal.ir/test">
-      <input type="checkbox" name="botcheck" id="" style="display: none;">
+      <input type="hidden" name="cartData">
+      <input type="checkbox" name="botcheck" style="display: none;">
       <input type="text" name="name" placeholder="نام و نام خانوادگی" required>
       <input type="email" name="email" placeholder="ایمیل" required>
       <textarea name="message" placeholder="توضیحات اضافی" required></textarea>
       <button type="submit">ارسال و مرحله بعدی</button>
+      <div id="formMessage" class="error-message" style="display: none;"></div>
     </form>
   </div>
-
 <script>
-  function submitForm(e) {
-    // اگر اعتبارسنجی داشتی، اینجا بررسی کن و در صورت رد شدن return false
+  let cartItems = [];
+
+  function showProducts() {
+    document.getElementById('home').classList.add('hidden');
+    document.getElementById('products').classList.remove('hidden');
+    document.getElementById('cart').classList.add('active');
+  }
+
+  function goHome() {
+    document.getElementById('products').classList.add('hidden');
+    document.getElementById('checkout').classList.add('hidden');
+    document.getElementById('home').classList.remove('hidden');
+    document.getElementById('cart').classList.remove('active');
+  }
+
+  function goToCheckout() {
+    if (cartItems.length === 0) {
+      alert('سبد خرید خالی است!');
+      return;
+    }
+    document.getElementById('products').classList.add('hidden');
+    document.getElementById('checkout').classList.remove('hidden');
+    document.getElementById('cart').classList.remove('active');
+  }
+
+  function addToCart(name, price) {
+    cartItems.push({ name, price });
+    updateCart();
+  }
+
+  function updateCart() {
+    const cartList = document.getElementById('cartList');
+    cartList.innerHTML = '';
+    cartItems.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'cart-row';
+      row.innerHTML = `<div>${item.name}</div><div>${item.price} هزار تومان</div>`;
+      cartList.appendChild(row);
+    });
+    document.getElementById('cart').classList.add('active');
+  }
+
+  async function submitForm(e) {
+    e.preventDefault();
+    const form = e.target;
+    const formMessage = document.getElementById('formMessage');
+    formMessage.style.display = 'none';
+
     try {
-      const items = window.cartItems || [];
-      const safe = JSON.stringify(items).slice(0,3000);
-      let cartInput = document.querySelector('form input[name="cartData"]');
-      if (!cartInput) {
-        cartInput = document.createElement('input');
-        cartInput.type = 'hidden';
-        cartInput.name = 'cartData';
-        document.querySelector('form').appendChild(cartInput);
+      const cartInput = form.querySelector('input[name="cartData"]');
+      cartInput.value = JSON.stringify(cartItems).slice(0, 3000);
+
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (response.ok) {
+        formMessage.className = 'success-message';
+        formMessage.textContent = 'فرم با موفقیت ارسال شد! در حال انتقال...';
+        formMessage.style.display = 'block';
+        setTimeout(() => {
+          window.location.href = form.querySelector('input[name="redirect"]').value;
+        }, 2000);
+      } else {
+        const error = await response.json();
+        formMessage.className = 'error-message';
+        formMessage.textContent = error.message || 'خطایی در ارسال فرم رخ داد.';
+        formMessage.style.display = 'block';
       }
-      cartInput.value = safe;
-    } catch (err) { console.error(err); }
-    return true; // مهم: اجازه بده مرورگر فرم را ارسال کند
+    } catch (err) {
+      console.error('Form submission error:', err);
+      formMessage.className = 'error-message';
+      formMessage.textContent = 'خطایی در ارسال فرم رخ داد.';
+      formMessage.style.display = 'block';
+    }
+    return false;
   }
 </script>
-
-<form action="https://api.web3forms.com/submit" method="POST" onsubmit="return submitForm(event)">
-  <!-- inputs... -->
-</form>
-
 </body>
 </html>
