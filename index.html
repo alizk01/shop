@@ -2,49 +2,51 @@
 <html lang="fa">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="description" content="فروشگاه علی زدکا - خرید فلش‌های آهنگ و محصولات متنوع با بهترین قیمت" />
   <meta name="keywords" content="فروشگاه آنلاین, فلش آهنگ, تیشرت, ماگ, علی زدکا" />
   <title>فروشگاه علی زدکا</title>
   <link href="https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.css" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0c0e;
-      --card: #0f1113;
-      --muted: #9aa0a6;
-      --text: #e6e7e8;
-      --accent: #3aa6ff;
-      --accent-2: #7bd389;
-      --error: #ff5252;
+      --bg: #0b0c0e;        /* پس‌زمینه اصلی تیره */
+      --card: #0f1113;      /* رنگ کارت‌ها */
+      --muted: #9aa0a6;     /* رنگ متون کم‌رنگ */
+      --text: #e6e7e8;      /* رنگ متون روشن */
+      --accent: #3aa6ff;    /* رنگ اکسنت آبی */
+      --accent-2: #7bd389;  /* رنگ اکسنت سبز */
+      --error: #ff5252;     /* رنگ خطا قرمز */
     }
     html, body {
+      height: 100%;
       margin: 0;
-      font-family: 'Vazir', Tahoma, sans-serif;
-      direction: rtl;
-      text-align: right;
-      background: linear-gradient(180deg, #060607 0%, #0b0c0e 100%);
+      padding: 0;
       overflow-x: hidden;
-      color: var(--text);
-      scroll-behavior: smooth;
-      height: 100vh;
+      background: var(--bg); /* پس‌زمینه مشکی شیک */
     }
     body {
       display: flex;
       align-items: flex-start;
       justify-content: center;
       padding: 24px;
-      padding-bottom: 100px;
+      padding-bottom: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      min-height: 100vh;
+      background: var(--bg); /* اطمینان از رنگ مشکی زیر صفحه */
     }
     .card {
       width: 100%;
       max-width: 520px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); /* گرادیانت کم‌رنگ */
       border-radius: 18px;
       padding: 22px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.6);
       border: 1px solid rgba(255,255,255,0.03);
       text-align: center;
       height: auto;
+      margin-bottom: 0;
+      color: var(--text);
     }
     #home, #products, #checkout {
       transition: opacity 0.3s ease;
@@ -63,6 +65,7 @@
     h1 {
       margin: 0;
       font-size: 20px;
+      color: var(--text);
     }
     p.sub {
       margin: 4px 0 0;
@@ -105,7 +108,7 @@
       margin-top: 14px;
       text-align: right;
       padding-top: 60px;
-      padding-bottom: 100px;
+      padding-bottom: 0;
       position: relative;
       height: auto;
     }
@@ -160,6 +163,7 @@
       margin: 0;
       font-weight: bold;
       margin-bottom: 4px;
+      color: var(--text);
     }
     .description {
       font-size: 10px;
@@ -187,7 +191,7 @@
       color: var(--muted);
       font-size: 14px;
       margin-top: 20px;
-      padding-bottom: 20px;
+      padding-bottom: 0;
     }
     .back-button {
       position: absolute;
@@ -231,6 +235,7 @@
       margin-bottom: 20px;
       font-weight: bold;
       text-align: center;
+      color: var(--text);
     }
     #flashList {
       display: grid;
@@ -465,35 +470,15 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
     @media (max-width: 767px) {
-      .back-button {
-        display: flex;
-      }
-      .products {
-        padding-top: 60px;
-      }
-      #flashList {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(4, auto);
-        gap: 5px;
-        width: 100%;
-        max-width: 100%;
-        justify-content: center;
-      }
-      .product {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        border-radius: 15px;
-      }
-      .cart {
-        bottom: 10px;
-      }
-      .cart.expanded {
-        width: calc(100% - 20px);
-        max-width: 350px;
+      .card {
+        padding: 15px;
+        margin: 0;
       }
       body {
-        padding: 10px;
+        padding: 0;
+      }
+      #checkout, #products, #home {
+        min-height: 100vh;
       }
     }
     @media (min-width: 768px) {
@@ -546,7 +531,7 @@
         <div class="total-section"><strong>جمع:</strong> <span id="totalText">۰</span> تومان</div>
       </div>
       <h2>تکمیل اطلاعات پستی سفارش</h2>
-      <form id="checkoutForm" method="POST" data-netlify="true" name="order-form" netlify-honeypot="bot-field">
+      <form id="checkoutForm" method="POST" action="https://formspree.io/f/YOUR_FORMSPREE_ID" netlify-honeypot="bot-field">
         <input type="hidden" name="bot-field" />
         <div class="form-group">
           <label for="name">نام</label>
@@ -822,22 +807,12 @@
     }
     function handleNext(event) {
       event.preventDefault();
+      if (!validateForm()) return;
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
       const city = document.getElementById('city').value.trim();
       const address = document.getElementById('address').value.trim();
       const items = Object.values(cart).filter(i => i.qty > 0);
-      const totalQty = items.reduce((s, i) => s + i.qty, 0);
-      const nameRegex = /^[\u0600-\u06FF\sA-Za-z]+$/;
-      const phoneRegex = /^\d{11}$/;
-      const isNameValid = name && name.length >= 3 && nameRegex.test(name);
-      const isPhoneValid = phone && phoneRegex.test(phone);
-      const isCityValid = city && city.length >= 2;
-      const isAddressValid = address && address.length >= 10;
-      if (!isNameValid || !isPhoneValid || !isCityValid || !isAddressValid || totalQty === 0) {
-        showToast('فیلدهای اجباری باید کامل پر شوند');
-        return;
-      }
       const formData = {
         name,
         phone,
@@ -864,15 +839,16 @@
       if (totalQty >= 21) discountPercent = 26;
       let discount = Math.round(total * discountPercent / 100);
       const finalAmountRial = total - discount;
-      // ارسال فرم به Netlify
-      fetch(checkoutForm.action || '/', {
+      fetch(checkoutForm.action, {
         method: 'POST',
-        body: new FormData(checkoutForm)
+        body: new FormData(checkoutForm),
+        headers: {
+          'Accept': 'application/json'
+        }
       }).then(response => {
         console.log('Form submission response:', response);
         if (response.ok) {
           showToast('اطلاعات با موفقیت ثبت شد');
-          // هدایت به زیبال (فعلاً placeholder)
           setTimeout(() => {
             window.location.href = `https://gateway.zibal.ir/start/YOUR_ZIBAL_LINK?amount=${finalAmountRial}&mobile=${phone}&description=سفارش فلش از فروشگاه علی زدکا`;
           }, 1000);
@@ -927,7 +903,7 @@
     function showToast(msg) {
       toast.textContent = msg;
       toast.style.display = 'block';
-      setTimeout(() => toast.style.display = 'none', 2000);
+      setTimeout(() => toast.style.display = 'none', 2000); // برگشت به 2 ثانیه
     }
     flashList.addEventListener('click', (e) => {
       const product = e.target.closest('.product');
