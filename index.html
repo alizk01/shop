@@ -9,20 +9,20 @@
   <link href="https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.css" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0c0e;        /* پس‌زمینه اصلی تیره */
-      --card: #0f1113;      /* رنگ کارت‌ها */
-      --muted: #9aa0a6;     /* رنگ متون کم‌رنگ */
-      --text: #e6e7e8;      /* رنگ متون روشن */
-      --accent: #3aa6ff;    /* رنگ اکسنت آبی */
-      --accent-2: #7bd389;  /* رنگ اکسنت سبز */
-      --error: #ff5252;     /* رنگ خطا قرمز */
+      --bg: #0b0c0e;
+      --card: #0f1113;
+      --muted: #9aa0a6;
+      --text: #e6e7e8;
+      --accent: #3aa6ff;
+      --accent-2: #7bd389;
+      --error: #ff5252;
     }
     html, body {
       height: 100%;
       margin: 0;
       padding: 0;
       overflow-x: hidden;
-      background: var(--bg); /* پس‌زمینه مشکی شیک */
+      background: var(--bg);
     }
     body {
       display: flex;
@@ -33,12 +33,12 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       min-height: 100vh;
-      background: var(--bg); /* اطمینان از رنگ مشکی زیر صفحه */
+      background: var(--bg);
     }
     .card {
       width: 100%;
       max-width: 520px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); /* گرادیانت کم‌رنگ */
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       border-radius: 18px;
       padding: 22px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.6);
@@ -183,9 +183,6 @@
       font-size: 12px;
       color: var(--muted);
     }
-    .quantity-controls {
-      display: none;
-    }
     .scroll-hint {
       text-align: center;
       color: var(--muted);
@@ -246,6 +243,7 @@
       max-width: 100%;
       justify-content: center;
       align-items: end;
+      direction: rtl; /* جهت RTL برای چینش از راست به چپ */
     }
     .cart {
       position: fixed;
@@ -838,7 +836,7 @@
       if (totalQty >= 13 && totalQty <= 20) discountPercent = 23;
       if (totalQty >= 21) discountPercent = 26;
       let discount = Math.round(total * discountPercent / 100);
-      const finalAmountRial = total - discount;
+      const finalAmountRial = (total - discount) * 10; // تبدیل به ریال (1 تومان = 10 ریال)
       fetch(checkoutForm.action, {
         method: 'POST',
         body: new FormData(checkoutForm),
@@ -846,11 +844,12 @@
           'Accept': 'application/json'
         }
       }).then(response => {
-        console.log('Form submission response:', response);
+        console.log('Formspree response:', response);
         if (response.ok) {
           showToast('اطلاعات با موفقیت ثبت شد');
+          // هدایت به درگاه زیبال
           setTimeout(() => {
-            window.location.href = `https://gateway.zibal.ir/start/YOUR_ZIBAL_LINK?amount=${finalAmountRial}&mobile=${phone}&description=سفارش فلش از فروشگاه علی زدکا`;
+            window.location.href = `https://gateway.zibal.ir/start/YOUR_ZIBAL_MERCHANT_ID?amount=${finalAmountRial}&mobile=${phone}&description=سفارش فلش از فروشگاه علی زدکا`;
           }, 1000);
         } else {
           showToast('خطا در ثبت اطلاعات فرم');
@@ -903,7 +902,7 @@
     function showToast(msg) {
       toast.textContent = msg;
       toast.style.display = 'block';
-      setTimeout(() => toast.style.display = 'none', 2000); // برگشت به 2 ثانیه
+      setTimeout(() => toast.style.display = 'none', 2000); // 2 ثانیه
     }
     flashList.addEventListener('click', (e) => {
       const product = e.target.closest('.product');
